@@ -22,7 +22,7 @@ int DecStrToHexStrOf64(
     const uint32_t inlen,
     char * out
 ) {
-    uint32_t fs[inlen];
+    uint32_t fs[2000];
     uint32_t tmp;
     uint32_t rem;
     uint32_t ip;

@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Time stamp
@@ -31,6 +31,7 @@ char * TimeStamp(
     timestamp_t * stamp
 )
 {
+    /*
     // get real time
     clock_gettime(CLOCK_REALTIME, &(stamp->realtime));
     // convert seconds to human-readable form
@@ -41,8 +42,9 @@ char * TimeStamp(
     // calculate milliseconds
     long int millisec = (stamp->realtime).tv_nsec / 1e6;
     sprintf(stamp->timestamp + 24, "%03d: ", millisec);
-
+    */
     return stamp->timestamp;
+    
 }
  
 ////////////////////////////////////////////////////////////////////////////////

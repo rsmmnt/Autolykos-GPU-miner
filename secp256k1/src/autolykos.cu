@@ -27,7 +27,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include <atomic>
 #include <thread>
 #include <chrono>
@@ -121,6 +121,7 @@ int main(int argc, char* argv[])
     fflush(stdout);
     */
     // check access to config file
+    /*
     if (access(filename, F_OK) == -1)
     {
         /*
@@ -129,13 +130,13 @@ int main(int argc, char* argv[])
         fprintf(
             stderr, "%s" TEXT_TERMINATION TEXT_SEPARATOR, TimeStamp(&stamp)
         );
-        */
+        
 
         LOG(ERROR) << "Config file not found " << filename;
 
         return EXIT_FAILURE;
     }
-
+    */
     // read config from file
     status = ReadConfig(filename, info.sk_h, info.skstr, from, info.to, &info.keepPrehash, &stamp);
 
