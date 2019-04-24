@@ -26,7 +26,7 @@ int DecStrToHexStrOf64(
     #ifndef _WIN32
     uint32_t fs[inlen];
     #else
-    uint32_t fs[1024];
+    uint32_t fs[2048];
     #endif
     uint32_t tmp;
     uint32_t rem;

@@ -5,7 +5,7 @@
     AUTOLYKOS -- Autolykos puzzle cycle
 
 *******************************************************************************/
-
+#include "../include/websocket.h"
 #include "../include/compaction.h"
 #include "../include/conversion.h"
 #include "../include/cryptography.h"
@@ -33,6 +33,10 @@
 #include <sys/types.h>
 #include <thread>
 #include <vector>
+
+#ifdef COMM_WEBSOCKET
+#include "../include/websocket.h"
+#endif
 
 #ifdef _WIN32
 #include <io.h>
@@ -127,7 +131,12 @@ int main(int argc, char ** argv)
     );
 
     LOG(INFO) << logstr;
+    #ifdef COMM_WEBSOCKET
+    WebSocketComm wsComm("ws://localhost:3000", &info);
 
+
+
+    #else
     status = GetLatestBlock(
         from, &request, &info, true
     );
@@ -135,7 +144,7 @@ int main(int argc, char ** argv)
     {
         LOG(INFO) << "First block getting request failed, maybe wrong node address?";
     }
-
+    #endif
 
     std::vector<std::thread> miners(deviceCount);
 
@@ -149,6 +158,22 @@ int main(int argc, char ** argv)
     //====================================================================//
     // bomb node with HTTP with 10ms intervals, if new block came 
     // signal miners with blockId
+    #ifdef COMM_WEBSOCKET
+    
+    while(1)
+    {
+        int rslt = wsComm.check();
+        std::this_thread::sleep_for(std::chrono::milliseconds(8));
+
+
+    }
+
+
+
+
+    #else
+
+    
     uint_t curlcnt = 0;
     const uint_t curltimes = 2000;
 
@@ -181,7 +206,7 @@ int main(int argc, char ** argv)
 
         std::this_thread::sleep_for(std::chrono::milliseconds(8));
     }    
-
+    #endif
     return EXIT_SUCCESS;
 }
 
@@ -255,13 +280,13 @@ void MinerThread(int deviceId, info_t * info)
     
     if(freeMem < MIN_FREE_MEMORY)
     {
-        LOG(ERROR) << "Not enough GPU memory for mining, minimum 2.8 GiB needed";
+        LOG(ERROR) << "Not enough free GPU memory for mining, minimum 2.8 GiB needed";
         return;
     }
 
     if(keepPrehash && freeMem < MIN_FREE_MEMORY_PREHASH)
     {
-        LOG(ERROR) << "Not enough memory for keeping prehashes, "
+        LOG(ERROR) << "Not enough free GPU memory for keeping prehashes, "
                    << "setting keepPrehash to false";
         keepPrehash = 0;
     }
