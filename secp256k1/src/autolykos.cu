@@ -154,6 +154,10 @@ void MinerThread(int deviceId, info_t * info)
     // indices of unfinalized hashes
     uint32_t * indices_d = res_d + NONCES_PER_ITER * NUM_SIZE_32;
 
+    CUDA_CALL(cudaMemset(
+        indices_d, 0, NUM_SIZE_8
+    ));
+
     // unfinalized hash contexts
     // if keepPrehash == true // N_LEN * 80 bytes // 5 GiB
     uctx_t * uctxs_d = NULL;
@@ -309,19 +313,33 @@ void MinerThread(int deviceId, info_t * info)
         // restart iteration if new block was found
         if (blockId != info->blockId.load()) { continue; }
 
+        
         // try to find solution
+        /*
         ind = FindNonZero(
             indices_d, indices_d + NONCES_PER_ITER, NONCES_PER_ITER
         );
+        */
+        
+ 
+
+        CUDA_CALL(cudaMemcpy(
+            ind, indices_d, NUM_SIZE_8,
+            cudaMemcpyDeviceToHost
+        ));
+
+
+
 
         // solution found
         if (ind)
         {
             CUDA_CALL(cudaMemcpy(
-                res_h, (res_d + ((ind - 1) << 3)), NUM_SIZE_8,
+                res_h, res_d , NUM_SIZE_8,
                 cudaMemcpyDeviceToHost
             ));
-
+            
+            
             *((uint64_t *)nonce) = base + ind - 1;
 
             PrintPuzzleSolution(nonce, res_h, logstr);
@@ -329,8 +347,12 @@ void MinerThread(int deviceId, info_t * info)
 
             LOG(INFO) << "GPU " << deviceId
                 << " found and posted a solution:\n" << logstr;
+            
     
             state = STATE_KEYGEN;
+            CUDA_CALL(cudaMemset(
+                indices_d, 0, NUM_SIZE_8
+            ));
         }
 
         base += NONCES_PER_ITER;
