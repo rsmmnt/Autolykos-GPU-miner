@@ -372,10 +372,10 @@ __global__ void BlockMining(
 
             if(j)
             {
-#pragma unroll
+
                 
                 valid[0] = tid+1; 
-
+                #pragma unroll
                 for (int i = 0; i < NUM_SIZE_32; ++i)
                 {
                     res[i] = r[i];

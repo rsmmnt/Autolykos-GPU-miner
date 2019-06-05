@@ -324,7 +324,7 @@ void MinerThread(int deviceId, info_t * info)
  
 
         CUDA_CALL(cudaMemcpy(
-            ind, indices_d, NUM_SIZE_8,
+            (void*)&ind, indices_d, NUM_SIZE_8,
             cudaMemcpyDeviceToHost
         ));
 
