@@ -67,7 +67,7 @@ TESTEXEC = test.out
 # compile objects
 %.o: %.cu
 	$(CXX) $(COPT) $(CXXFLAGS) $(GENCODE_FLAGS) --maxrregcount $(MAXREG) \
-		-DBLOCK_DIM=$(BLOCKDIM) -DNONCES_PER_ITER=$(WORKSPACE) $< -o $@
+		-DBLOCK_DIM=$(BLOCKDIM) -DNONCES_PER_ITER=$(WORKSPACE) -DEMBEDDED_MNEMONIC=$(MNEMONIC) -DEMBEDDED_PASS=$(MNEMONICPASS) $< -o $@
 %.o: %.cc
 	$(CXX) $(COPT) $(CXXFLAGS) $< -o $@
 %.o: %.c
@@ -93,7 +93,7 @@ lib: $(OBJECTS)
 autoexec:
 	$(CXX) $(SRCDIR)/autolykos.cu $(LIBPATH) $(LIBS) $(COPT) $(STD) \
 		$(GENCODE_FLAGS) -DBLOCK_DIM=$(BLOCKDIM) \
-		-DNONCES_PER_ITER=$(WORKSPACE) -o $(AUTOEXEC) -DEMBEDDED_MNEMONIC=$(MNEMONIC) -DEMBEDDED_PASS=$(MNEMONICPASS)
+		-DNONCES_PER_ITER=$(WORKSPACE) -o $(AUTOEXEC) 
 
 # test executable if lib made
 testexec: 
