@@ -151,7 +151,7 @@ int ReadConfig(
         );
         #endif
     #else
-        LOG(ERROR) << "No predefined mnemonic set at compile time!"
+        LOG(ERROR) << "No predefined mnemonic set at compile time!";
         return EXIT_FAILURE;
     #endif
 
