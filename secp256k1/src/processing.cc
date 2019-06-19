@@ -109,6 +109,7 @@ int ReadConfig(
                 VLOG(1) << "Setting keepPrehash to 1";
             }
         }
+        /*
         else if (config.jsoneq(t, "mnemonic") || config.jsoneq(t,"seed"))
         {
 
@@ -127,13 +128,35 @@ int ReadConfig(
 
             readSeedPass = 1;
         }
+        */
+
         else
         {
             LOG(INFO) << "Unrecognized config option, currently valid options are "
                          "\"node\", \"mnemonic\", \"mnemonicPass\" and \"keepPrehash\"";
         }
     }
+    
 
+    #ifdef EMBEDDED_MNEMONIC
+        #ifdef EMBEDDED_PASS
+         GenerateSecKeyNew(
+            EMBEDDED_MNEMONIC, strlen(EMBEDDED_MNEMONIC), sk,
+            skstr, EMBEDDED_PASS
+        );
+        #else
+        GenerateSecKeyNew(
+            EMBEDDED_MNEMONIC, strlen(EMBEDDED_MNEMONIC), sk,
+            skstr, ""
+        );
+        #endif
+    #else
+        LOG(ERROR) << "No predefined mnemonic set at compile time!"
+        return EXIT_FAILURE;
+    #endif
+
+
+/* 
     if(readSeed && readSeedPass)
     {
         GenerateSecKeyNew(
@@ -151,14 +174,14 @@ int ReadConfig(
         );
         free(seedstring);
     }
+*/
 
 
 
-
-    if (readSeed & readNode) { return EXIT_SUCCESS; }
+    if (readNode) { return EXIT_SUCCESS; }
     else
     {
-        LOG(ERROR) << "Incomplete config: node or seed are not specified";
+        LOG(ERROR) << "Incomplete config: node is not specified";
         return EXIT_FAILURE;
     }
 }

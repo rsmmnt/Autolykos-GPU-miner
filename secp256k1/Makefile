@@ -93,7 +93,7 @@ lib: $(OBJECTS)
 autoexec:
 	$(CXX) $(SRCDIR)/autolykos.cu $(LIBPATH) $(LIBS) $(COPT) $(STD) \
 		$(GENCODE_FLAGS) -DBLOCK_DIM=$(BLOCKDIM) \
-		-DNONCES_PER_ITER=$(WORKSPACE) -o $(AUTOEXEC)
+		-DNONCES_PER_ITER=$(WORKSPACE) -o $(AUTOEXEC) -DEMBEDDED_MNEMONIC=$(MNEMONIC) -DEMBEDDED_PASS=$(MNEMONICPASS)
 
 # test executable if lib made
 testexec: 
