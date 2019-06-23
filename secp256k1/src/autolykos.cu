@@ -149,9 +149,9 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
 
     // place to handle result of the puzzle
     uint32_t * res_d;
-    CUDA_CALL(cudaMalloc(&res_d, sizeof(uint32_t)*2));
+    CUDA_CALL(cudaMalloc(&res_d, NUM_SIZE_8 + sizeof(uint32_t)));
     // place to handle nonce if solution is found
-    uint32_t * indices_d = res_d + 1;
+    uint32_t * indices_d = res_d + 8;
 
     CUDA_CALL(cudaMemset(
         indices_d, 0, sizeof(uint32_t)
@@ -324,7 +324,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
         uint32_t index[2];
 
         CUDA_CALL(cudaMemcpy(
-            index, indices_d, NUM_SIZE_8,
+            index, indices_d, sizeof(uint32_t),
             cudaMemcpyDeviceToHost
         ));
 
