@@ -199,7 +199,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
     }
 
     int cntCycles = 0;
-    int NCycles = 10;
+    int NCycles = 200;
     start = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
     do
