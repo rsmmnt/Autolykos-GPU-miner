@@ -154,7 +154,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
     uint32_t * indices_d = res_d + 1;
 
     CUDA_CALL(cudaMemset(
-        indices_d, 0, NUM_SIZE_8
+        indices_d, 0, sizeof(uint32_t)
     ));
 
     // unfinalized hash contexts
@@ -351,7 +351,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
     
             state = STATE_KEYGEN;
             CUDA_CALL(cudaMemset(
-                indices_d, 0, NUM_SIZE_8
+                indices_d, 0, sizeof(uint32_t)
             ));
         }
 
