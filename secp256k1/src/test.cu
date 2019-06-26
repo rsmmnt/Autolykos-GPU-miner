@@ -181,7 +181,15 @@ int TestSolutions(
     ));
     LOG(INFO) << "Result nonce: " << std::hex << nonce - 1; 
     LOG(INFO) << "Number of results: " << numSols;
-    LOG(INFO) << "Result solution:" << std::hex << res_h[0] << " " << res_h[1] << " " << res_h[2] << " " << res_h[3] ;
+    LOG(INFO) << "Result solution:";
+    LOG(INFO) << std::hex << res_h[0];
+    LOG(INFO) << std::hex << res_h[1];
+    LOG(INFO) << std::hex << res_h[2];
+    LOG(INFO) << std::hex << res_h[3];
+
+
+
+
 
     for (int i = 0; i < 3; ++i)
     {        
