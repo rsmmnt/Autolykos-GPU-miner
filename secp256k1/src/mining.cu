@@ -380,7 +380,7 @@ __global__ void BlockMining(
                 {
                     res[i] = r[i];
                 }
-
+                res[NUM_SIZE_32] ++;
             }
         }
 
