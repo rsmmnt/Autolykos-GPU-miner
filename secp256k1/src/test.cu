@@ -159,19 +159,25 @@ int TestSolutions(
 
     uint64_t res_h[3 * NUM_SIZE_64];
 
-    for (int i = 0; i < 3; ++i)
-    {
-        // copy results to host
-        CUDA_CALL(cudaMemcpy(
-            res_h, res_d + ref_indices[i] * NUM_SIZE_32, NUM_SIZE_8,
-            cudaMemcpyDeviceToHost
-        ));
+    uint32_t solFound = 0;
+    // copy results to host
+    CUDA_CALL(cudaMemcpy(
+        res_h, res_d, NUM_SIZE_8,
+        cudaMemcpyDeviceToHost
+    ));
 
-        if (memcmp(res_h, ref_res + i * NUM_SIZE_64, NUM_SIZE_8))
+    for (int i = 0; i < 3; ++i)
+    {        
+        if (!memcmp(res_h, ref_res + i * NUM_SIZE_64, NUM_SIZE_8))
         {
-            LOG(ERROR) << "Solutions test failed";
-            exit(EXIT_FAILURE);
+            solFound = 1;
         }
+    }
+
+    if(!solFound)
+    {
+        LOG(ERROR) << "Solutions test failed";
+        exit(EXIT_FAILURE);
     }
 
     //========================================================================//
