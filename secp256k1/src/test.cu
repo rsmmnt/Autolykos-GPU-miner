@@ -577,7 +577,7 @@ int main(int argc, char ** argv)
     ((uint64_t *)info.bound)[0] = 0xFFFFFFFFFFFFFFFF;
     ((uint64_t *)info.bound)[1] = 0xFFFFFFFFFFFFFFFF;
     ((uint64_t *)info.bound)[2] = 0xFFFFFFFFFFFFFFFF;
-    ((uint64_t *)info.bound)[3] = 0x000000FFFFFFFFFF;
+    ((uint64_t *)info.bound)[3] = 0x000002FFFFFFFFFF;
 
     ((uint64_t *)info.mes)[0] = 1;
     ((uint64_t *)info.mes)[1] = 0;
