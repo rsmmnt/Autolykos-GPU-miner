@@ -160,13 +160,18 @@ int TestSolutions(
     uint64_t res_h[3 * NUM_SIZE_64];
 
     uint32_t solFound = 0;
+    uint32_t nonce;
     // copy results to host
     CUDA_CALL(cudaMemcpy(
         res_h, res_d, NUM_SIZE_8,
         cudaMemcpyDeviceToHost
     ));
-
-    LOG(INFO) << "Result solution:" << res_h[0] << " " << res_h[1] << " " << res_h[2] << " " << res_h[3];
+    CUDA_CALL(cudaMemcpy(
+        &nonce, indices_d, sizeof(uint32_t),
+        cudaMemcpyDeviceToHost
+    ));
+    LOG(INFO) << "Result nonce: " << std::hex << nonce; 
+    LOG(INFO) << "Result solution:" << std::hex << res_h[0] << " " << res_h[1] << " " << res_h[2] << " " << res_h[3];
 
     for (int i = 0; i < 3; ++i)
     {        
