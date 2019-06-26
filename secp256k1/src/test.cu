@@ -77,6 +77,8 @@ int TestSolutions(
     // indices of unfinalized hashes
     uint32_t * indices_d = res_d + NONCES_PER_ITER * NUM_SIZE_32;
 
+    CUDA_CALL(cudaMemset(indices_d,0,sizeof(uint32_t)));
+
     uctx_t * uctxs_d = NULL;
 
     if (info->keepPrehash)
@@ -179,7 +181,7 @@ int TestSolutions(
     ));
     LOG(INFO) << "Result nonce: " << std::hex << nonce; 
     LOG(INFO) << "Number of results: " << numSols;
-    LOG(INFO) << "Result solution:" << std::hex << res_h[0] << " " << res_h[1] << " " << res_h[2] << " " << res_h[3];
+    LOG(INFO) << "Result solution:" << std::hex << res_h[0] << " " << res_h[1] << " " << res_h[2] << " " << res_h[3] << res_h[4] << res_h[5];
 
     for (int i = 0; i < 3; ++i)
     {        
