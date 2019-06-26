@@ -158,8 +158,8 @@ int TestSolutions(
         0x3D2B0B32A1E52137, 0x2406A4B8304E264A, 0x1329C47EBABBB9A8,
         0x9D7AFFEA975A94CF, 0xABFBCFEA7171F4AA, 0x3BA19A1A3D28B102
     };
-
-    uint64_t res_h[3 * NUM_SIZE_64];
+    cudaDeviceSynchronize();
+    uint64_t res_h[NUM_SIZE_64];
 
     uint32_t solFound = 0;
     uint32_t nonce;
@@ -179,9 +179,9 @@ int TestSolutions(
         &nonce, indices_d, sizeof(uint32_t),
         cudaMemcpyDeviceToHost
     ));
-    LOG(INFO) << "Result nonce: " << std::hex << nonce; 
+    LOG(INFO) << "Result nonce: " << std::hex << nonce - 1; 
     LOG(INFO) << "Number of results: " << numSols;
-    LOG(INFO) << "Result solution:" << std::hex << res_h[0] << " " << res_h[1] << " " << res_h[2] << " " << res_h[3] << res_h[4] << res_h[5];
+    LOG(INFO) << "Result solution:" << std::hex << res_h[0] << " " << res_h[1] << " " << res_h[2] << " " << res_h[3] ;
 
     for (int i = 0; i < 3; ++i)
     {        
