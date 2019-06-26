@@ -294,13 +294,6 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
             state = STATE_CONTINUE;
         }
 
-
-        VLOG(1) << "Starting mining cycle";
-
-        // restart iteration if new block was found
-        if (blockId != info->blockId.load()) { continue; }
-
-
         VLOG(1) << "Starting main BlockMining procedure";
 
         // calculate solution candidates
