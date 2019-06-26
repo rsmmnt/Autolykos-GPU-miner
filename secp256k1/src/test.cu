@@ -166,9 +166,11 @@ int TestSolutions(
         cudaMemcpyDeviceToHost
     ));
 
+    LOG(INFO) << "Result solution:" << res_h[0] << " " << res_h[1] << " " << res_h[2] << " " << res_h[3];
+
     for (int i = 0; i < 3; ++i)
     {        
-        if (!memcmp(res_h, ref_res + i * NUM_SIZE_64, NUM_SIZE_8))
+        if (memcmp(res_h, ref_res + i * NUM_SIZE_64, NUM_SIZE_8) == 0)
         {
             solFound = 1;
         }
