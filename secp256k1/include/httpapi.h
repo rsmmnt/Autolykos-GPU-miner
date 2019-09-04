@@ -3,6 +3,7 @@
 
 #include "httplib.h"
 #include <vector>
+#include <string>
 
 void HttpApiThread(std::vector<double>* hashrates);
 
