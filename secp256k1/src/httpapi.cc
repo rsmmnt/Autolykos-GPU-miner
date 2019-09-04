@@ -1,5 +1,4 @@
 #include "../include/httpapi.h"
-#include <sstream>
 using namespace httplib;
 
 
@@ -8,6 +7,8 @@ inline int key(std::pair<int,int> x)
     return 100*x.first + x.second;
 }
 
+
+// outputs JSON with GPUs hashrates, temps, and power usages
 void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int>>* props)
 {
     Server svr;
@@ -25,20 +26,8 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
         std::stringstream strBuf;
         strBuf << "{ \"gpus\":" << (*hashrates).size() << " , ";
         strBuf << " \"devices\" : { " ;
-        /*
-        strBuf << "\"hashrates\": [ ";
-        double totalHr = 0;
-        for(int i = 0; i < (*hashrates).size(); i++)
-        {
-            strBuf << (*hashrates)[i];
-            if(i < (*hashrates).size() - 1) strBuf << " , ";
-            totalHr += (*hashrates)[i];
-        } 
-        strBuf << " ] , ";
-        */
-        //strBuf << "\"total\": " << totalHr << " , " ;
         
-        // NVML data if available
+        // NVML data 
         double totalHr = 0;
         nvmlReturn_t result;
         result = nvmlInit();
@@ -46,8 +35,6 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
         { 
             unsigned int devcount;
             result = nvmlDeviceGetCount(&devcount);
-            //std::stringstream temps;
-            //std::stringstream wattages;
             bool first = true;
             for(int i = 0; i < devcount; i++)
             {
@@ -72,6 +59,9 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
                     }
 
                     deviceInfo << " \"gpu" << i << "\" : { ";
+                    char devname[256];
+                    result = nvmlDeviceGetName (device, devname, 256 );
+                    deviceInfo << " \"devname\" : \"" << devname << "\" , ";                    
                     deviceInfo << " \"pciid\" : \"" << pciInfo.bus << "." << pciInfo.device << "\" , ";
                     double hrate;
                     try{
@@ -80,10 +70,8 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
                         deviceInfo << " \"hashrate\" : " << hrate << " , ";
                         totalHr += hrate;
                     }
-                    catch (...)
-                    {
-
-                    }
+                    catch (...) // if GPU is not mining ( CUDA_VISIBLE_DEVICES is set)
+                    {}
                     unsigned int temp;
                     unsigned int power;
                     result = nvmlDeviceGetPowerUsage ( device, &power );
@@ -108,6 +96,9 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
     });
     
 
-
+    #ifdef HTTPAPI_PORT
+    svr.listen("0.0.0.0", HTTPAPI_PORT);
+    #else
     svr.listen("0.0.0.0", 32067);
+    #endif
 }
