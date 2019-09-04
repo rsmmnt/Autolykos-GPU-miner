@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <nvml.h>
+#include <unordered_map>
 
 void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int>>* props);
 

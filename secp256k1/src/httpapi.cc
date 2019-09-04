@@ -53,7 +53,7 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
                     
 
                     nvmlPciInfo_t pciInfo;
-                    result = nvmlDeviceGetPciInfo ( nvmlDevice_t device, &pciInfo );
+                    result = nvmlDeviceGetPciInfo ( device, &pciInfo );
                     if(result != NVML_SUCCESS) { continue; }
 
                     if(first)
