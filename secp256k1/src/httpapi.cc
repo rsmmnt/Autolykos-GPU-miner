@@ -25,7 +25,6 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
         
         std::stringstream strBuf;
         strBuf << "{ \"gpus\":" << (*hashrates).size() << " , ";
-        strBuf << " \"devices\" : { " ;
         
         // NVML data 
         double totalHr = 0;
@@ -33,6 +32,8 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
         result = nvmlInit();
         if (result == NVML_SUCCESS)
         { 
+            strBuf << " \"devices\" : { " ;
+
             unsigned int devcount;
             result = nvmlDeviceGetCount(&devcount);
             bool first = true;
@@ -86,6 +87,10 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
 
 
             result = nvmlShutdown();
+        }
+        else
+        {
+            strBuf << " \"error\": \"NVML error, possibly some device fell off the bus\"";
         }
 
         strBuf << " } ";
