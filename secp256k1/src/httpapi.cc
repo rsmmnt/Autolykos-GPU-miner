@@ -32,7 +32,7 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
         result = nvmlInit();
         if (result == NVML_SUCCESS)
         { 
-            strBuf << " \"devices\" : { " ;
+            strBuf << " \"devices\" : [ " ;
 
             unsigned int devcount;
             result = nvmlDeviceGetCount(&devcount);
@@ -83,7 +83,7 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
                 }
             }
 
-            strBuf << " } , \"total\": " << totalHr  ;
+            strBuf << " ] , \"total\": " << totalHr  ;
 
 
             result = nvmlShutdown();
