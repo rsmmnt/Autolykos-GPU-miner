@@ -13,7 +13,7 @@ void HttpApiThread(std::vector<double>* hashrates)
         double totalHr = 0;
         for(int i = 0; i < (*hashrates).size(); i++)
         {
-            strBuf << (*hashrates)[i] << " ";
+            strBuf << (*hashrates)[i] << " , ";
             totalHr += (*hashrates)[i];
         } 
         strBuf << " ] , ";
