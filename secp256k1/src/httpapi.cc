@@ -2,13 +2,24 @@
 #include <sstream>
 using namespace httplib;
 
-void HttpApiThread(std::vector<double>* hashrates)
+void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int>>* props)
 {
     Server svr;
 
     svr.Get("/", [&](const Request& req, Response& res) {
+        
+        std::unordered_map<std::pair<int,int>, double> hrMap;
+        for(int i = 0; i < (*hashrates).size() ; i++)
+        {
+            hrMap[(*props)[i]] = (*hashrates)[i];
+        }
+        
+        
+        
         std::stringstream strBuf;
         strBuf << "{ \"gpus\":" << (*hashrates).size() << " , ";
+        strBuf << " \"devices\" : { " ;
+        /*
         strBuf << "\"hashrates\": [ ";
         double totalHr = 0;
         for(int i = 0; i < (*hashrates).size(); i++)
@@ -18,44 +29,63 @@ void HttpApiThread(std::vector<double>* hashrates)
             totalHr += (*hashrates)[i];
         } 
         strBuf << " ] , ";
-        strBuf << "\"total\": " << totalHr ;
+        */
+        //strBuf << "\"total\": " << totalHr << " , " ;
         
         // NVML data if available
+        double totalHr = 0;
         nvmlReturn_t result;
         result = nvmlInit();
         if (result == NVML_SUCCESS)
         { 
             unsigned int devcount;
             result = nvmlDeviceGetCount(&devcount);
-            std::stringstream temps;
-            std::stringstream wattages;
+            //std::stringstream temps;
+            //std::stringstream wattages;
             bool first = true;
             for(int i = 0; i < devcount; i++)
             {
+                std::stringstream deviceInfo;
                 nvmlDevice_t device;
                 result = nvmlDeviceGetHandleByIndex(i, &device);
                 if(result == NVML_SUCCESS)
                 {
-                    unsigned int temp;
-                    unsigned int power;
-                    result = nvmlDeviceGetPowerUsage ( device, &power );
-                    result = nvmlDeviceGetTemperature ( device, NVML_TEMPERATURE_GPU, &temp );
+                    
+
+                    nvmlPciInfo_t pciInfo;
+                    result = nvmlDeviceGetPciInfo ( nvmlDevice_t device, &pciInfo );
+                    if(result != NVML_SUCCESS) { continue; }
+
                     if(first)
                     {
                         first = false;
                     }
                     else
                     {
-                        temps << " , ";
-                        wattages << " , ";        
+                        deviceInfo << " , ";        
                     }
-                    temps << temp;
-                    wattages << power/1000;
+
+                    deviceInfo << " \"gpu" << i << "\" : { ";
+                    deviceInfo << " \"pciid\" : \"" << pciInfo.bus << "." << pciInfo.device << "\" , ";
+                    double hrate;
+                    if( hrMap[std::make_pair(pciInfo.bus, pciInfo.device)] != nullptr)
+                    {
+                        hrate = hrMap[std::make_pair(pciInfo.bus, pciInfo.device)];
+                        deviceInfo << " \"hashrate\" : " << hrate << " , ";
+                        totalHr += hrate;
+                    }
+
+                    unsigned int temp;
+                    unsigned int power;
+                    result = nvmlDeviceGetPowerUsage ( device, &power );
+                    result = nvmlDeviceGetTemperature ( device, NVML_TEMPERATURE_GPU, &temp );
+                    deviceInfo << " \"power\" : " << power/1000 << " , ";
+                    deviceInfo << " \"temperature\" : " << temp << " }";
+                    strBuf << deviceInfo.str();
                 }
             }
 
-            strBuf << " , \"temps\": [ " << temps.str() << " ] ,";
-            strBuf << " \"wattages\": [ " << wattages.str() << " ] ";
+            strBuf << " } , \"total\": " << totalHr  ;
 
 
             result = nvmlShutdown();

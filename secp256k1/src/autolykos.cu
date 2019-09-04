@@ -470,9 +470,16 @@ int main(int argc, char ** argv)
     std::vector<double> hashrates(deviceCount);
     std::vector<int> lastTimestamps(deviceCount);
     std::vector<int> timestamps(deviceCount);
-
+    
+    // PCI bus and device IDs
+    std::vector<std::pair<int,int>> devinfos(deviceCount);
     for (int i = 0; i < deviceCount; ++i)
     {
+        cudaDeviceProp props;
+        if(cudaGetDeviceProperties(&props, i) == cudaSuccess)
+        {
+            devinfos[i] = std::make_pair(props.pciBusID, props.pciDeviceID);
+        }
         miners[i] = std::thread(MinerThread, i, &info, &hashrates, &timestamps);
         hashrates[i] = 0;
         lastTimestamps[i] = 1;
@@ -492,7 +499,7 @@ int main(int argc, char ** argv)
         }
     }
     
-    std::thread httpApi = std::thread(HttpApiThread,&hashrates);    
+    std::thread httpApi = std::thread(HttpApiThread,&hashrates,&devinfos);    
 
     //========================================================================//
     //  Main thread get-block cycle
