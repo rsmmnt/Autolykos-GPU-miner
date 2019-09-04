@@ -74,13 +74,16 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
                     deviceInfo << " \"gpu" << i << "\" : { ";
                     deviceInfo << " \"pciid\" : \"" << pciInfo.bus << "." << pciInfo.device << "\" , ";
                     double hrate;
-                    if( hrMap[key(std::make_pair((int)pciInfo.bus, (int)pciInfo.device))] != nullptr)
-                    {
-                        hrate = hrMap[key(std::make_pair((int)pciInfo.bus, (int)pciInfo.device))];
+                    try{
+
+                        hrate = hrMap.at(key(std::make_pair((int)pciInfo.bus, (int)pciInfo.device)));
                         deviceInfo << " \"hashrate\" : " << hrate << " , ";
                         totalHr += hrate;
                     }
+                    catch (...)
+                    {
 
+                    }
                     unsigned int temp;
                     unsigned int power;
                     result = nvmlDeviceGetPowerUsage ( device, &power );
