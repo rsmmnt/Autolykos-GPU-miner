@@ -15,6 +15,7 @@
 #include "../include/processing.h"
 #include "../include/reduction.h"
 #include "../include/request.h"
+#include "../include/httpapi.h"
 #include <ctype.h>
 #include <cuda.h>
 #include <curl/curl.h>
