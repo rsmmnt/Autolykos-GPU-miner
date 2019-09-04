@@ -15,6 +15,7 @@
 #include "../include/processing.h"
 #include "../include/reduction.h"
 #include "../include/request.h"
+#include "../include/httplib.h"
 #include <ctype.h>
 #include <cuda.h>
 #include <curl/curl.h>
@@ -46,7 +47,7 @@
 INITIALIZE_EASYLOGGINGPP
 
 using namespace std::chrono;
-
+using namespace httplib;
 ////////////////////////////////////////////////////////////////////////////////
 //  Miner thread cycle
 ////////////////////////////////////////////////////////////////////////////////
@@ -501,6 +502,18 @@ int main(int argc, char ** argv)
     const uint_t curltimes = 2000;
 
     milliseconds ms = milliseconds::zero(); 
+    
+    Server svr;
+
+    svr.Get("/stats", [](const Request& req, Response& res) {
+        res.set_content("Stats page", "text/plain");
+    });
+
+    svr.Get("/", [&](const Request& req, Response& res) {
+        res.set_content("Main page", "text/plain");
+    });    
+
+    svr.listen("localhost", 32067);
 
     // bomb node with HTTP with 10ms intervals, if new block came 
     // signal miners with blockId
