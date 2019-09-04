@@ -37,7 +37,7 @@ void HttpApiThread(std::vector<double>* hashrates)
                     unsigned int temp;
                     unsigned int power;
                     result = nvmlDeviceGetPowerUsage ( device, &power );
-                    result = nvmlDeviceGetTemperature ( device, NVML_TEMPERATURE_COUNT, &temp );
+                    result = nvmlDeviceGetTemperature ( device, NVML_TEMPERATURE_GPU, &temp );
                     if(first)
                     {
                         first = false;
