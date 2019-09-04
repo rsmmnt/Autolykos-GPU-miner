@@ -2,16 +2,22 @@
 #include <sstream>
 using namespace httplib;
 
+
+inline int key(std::pair<int,int> x)
+{
+    return 100*x.first + x.second;
+}
+
 void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int>>* props)
 {
     Server svr;
 
     svr.Get("/", [&](const Request& req, Response& res) {
         
-        std::unordered_map<std::pair<int,int>, double> hrMap;
+        std::unordered_map<int, double> hrMap;
         for(int i = 0; i < (*hashrates).size() ; i++)
         {
-            hrMap[(*props)[i]] = (*hashrates)[i];
+            hrMap[key((*props)[i])] = (*hashrates)[i];
         }
         
         
@@ -68,9 +74,9 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
                     deviceInfo << " \"gpu" << i << "\" : { ";
                     deviceInfo << " \"pciid\" : \"" << pciInfo.bus << "." << pciInfo.device << "\" , ";
                     double hrate;
-                    if( hrMap[std::make_pair((int)pciInfo.bus, (int)pciInfo.device)] != nullptr)
+                    if( hrMap[key(std::make_pair((int)pciInfo.bus, (int)pciInfo.device))] != nullptr)
                     {
-                        hrate = hrMap[std::make_pair((int)pciInfo.bus, (int)pciInfo.device)];
+                        hrate = hrMap[key(std::make_pair((int)pciInfo.bus, (int)pciInfo.device))];
                         deviceInfo << " \"hashrate\" : " << hrate << " , ";
                         totalHr += hrate;
                     }
