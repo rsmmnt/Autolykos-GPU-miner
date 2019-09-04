@@ -25,10 +25,12 @@ void HttpApiThread(std::vector<double>* hashrates)
         result = nvmlInit();
         if (result == NVML_SUCCESS)
         { 
+            unsigned int devcount;
+            result = nvmlDeviceGetCount(&devcount);
             std::stringstream temps;
             std::stringstream wattages;
             bool first = true;
-            for(int i = 0; i < (*hashrates).size(); i++)
+            for(int i = 0; i < devcount; i++)
             {
                 nvmlDevice_t device;
                 result = nvmlDeviceGetHandleByIndex(i, &device);
