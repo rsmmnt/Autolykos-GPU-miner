@@ -68,9 +68,9 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
                     deviceInfo << " \"gpu" << i << "\" : { ";
                     deviceInfo << " \"pciid\" : \"" << pciInfo.bus << "." << pciInfo.device << "\" , ";
                     double hrate;
-                    if( hrMap[std::make_pair(pciInfo.bus, pciInfo.device)] != nullptr)
+                    if( hrMap[std::make_pair((int)pciInfo.bus, (int)pciInfo.device)] != nullptr)
                     {
-                        hrate = hrMap[std::make_pair(pciInfo.bus, pciInfo.device)];
+                        hrate = hrMap[std::make_pair((int)pciInfo.bus, (int)pciInfo.device)];
                         deviceInfo << " \"hashrate\" : " << hrate << " , ";
                         totalHr += hrate;
                     }
