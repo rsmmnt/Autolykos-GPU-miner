@@ -513,7 +513,7 @@ int main(int argc, char ** argv)
         res.set_content("Main page", "text/plain");
     });    
 
-    svr.listen("localhost", 32067);
+    svr.listen("0.0.0.0", 32067);
 
     // bomb node with HTTP with 10ms intervals, if new block came 
     // signal miners with blockId
