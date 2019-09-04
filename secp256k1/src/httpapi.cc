@@ -48,7 +48,7 @@ void HttpApiThread(std::vector<double>* hashrates)
                         wattages << " , ";        
                     }
                     temps << temp;
-                    wattages << power;
+                    wattages << power/1000;
                 }
             }
 
@@ -58,10 +58,8 @@ void HttpApiThread(std::vector<double>* hashrates)
 
             result = nvmlShutdown();
         }
-        else
-        {
-            strBuf << " } ";
-        }
+
+        strBuf << " } ";
 
 
         std::string str = strBuf.str();
