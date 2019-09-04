@@ -62,7 +62,7 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
                     char devname[256];
                     result = nvmlDeviceGetName (device, devname, 256 );
                     deviceInfo << " \"devname\" : \"" << devname << "\" , ";                    
-                    deviceInfo << " \"pciid\" : \"" << pciInfo.bus << "." << pciInfo.device << "\" , ";
+                    deviceInfo << " \"pciid\" : \"" << pciInfo.busId << "\" , ";
                     double hrate;
                     try{
 
