@@ -24,7 +24,7 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
         
         
         std::stringstream strBuf;
-        strBuf << "{ \"gpus\":" << (*hashrates).size() << " , ";
+        strBuf << "{ ";
         
         // NVML data 
         double totalHr = 0;
@@ -32,11 +32,13 @@ void HttpApiThread(std::vector<double>* hashrates, std::vector<std::pair<int,int
         result = nvmlInit();
         if (result == NVML_SUCCESS)
         { 
-            strBuf << " \"devices\" : [ " ;
 
             unsigned int devcount;
             result = nvmlDeviceGetCount(&devcount);
             bool first = true;
+            strBuf << " \"gpus\":" << devcount << " , ";
+            strBuf << " \"devices\" : [ " ;
+
             for(int i = 0; i < devcount; i++)
             {
                 std::stringstream deviceInfo;
