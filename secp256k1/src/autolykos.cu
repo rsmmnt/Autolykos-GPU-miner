@@ -106,7 +106,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
     uint8_t pk_h[PK_SIZE_8];
     uint8_t x_h[NUM_SIZE_8];
     uint8_t w_h[PK_SIZE_8];
-    uint8_t res_h[NUM_SIZE_8];
+    uint8_t res_h[NUM_SIZE_8*MAX_SOLS];
     uint8_t nonce[NONCE_SIZE_8];
 
     char skstr[NUM_SIZE_4];
@@ -293,6 +293,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
             blockId = controlId;
             
             GenerateKeyPair(x_h, w_h);
+            LOG(INFO) << " W after gen :" << ((uint64_t*)w_h)[0] << ((uint64_t*)w_h)[1] << ((uint64_t*)w_h)[2] << ((uint64_t*)w_h)[3];
 
             VLOG(1) << "Generated new keypair,"
                 << " copying new data in device memory now";
