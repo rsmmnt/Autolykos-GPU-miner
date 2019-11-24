@@ -23,6 +23,7 @@
 #include "../include/reduction.h"
 #include "../include/request.h"
 #include "../include/httpapi.h"
+#include "../include/queue.h"
 #include <ctype.h>
 #include <cuda.h>
 #include <curl/curl.h>
@@ -54,10 +55,23 @@
 INITIALIZE_EASYLOGGINGPP
 
 using namespace std::chrono;
+
+void SenderThread(info_t * info, BlockQueue<MinerShare>* shQueue)
+{
+    while(true)
+    {
+        MinerShare share = shQueue->get();
+        PostPuzzleSolution(info->to, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
+
+    }
+
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //  Miner thread cycle
 ////////////////////////////////////////////////////////////////////////////////
-void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, std::vector<int>* tstamps)
+void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, std::vector<int>* tstamps, BlockQueue<MinerShare>* shQueue)
 {
     CUDA_CALL(cudaSetDevice(deviceId));
     cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
@@ -157,12 +171,20 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
 
     // place to handle result of the puzzle
     uint32_t * res_d;
-    CUDA_CALL(cudaMalloc(&res_d, NUM_SIZE_8 + sizeof(uint32_t)));
+    CUDA_CALL(cudaMalloc(&res_d, NUM_SIZE_8*MAX_SOLS + MAX_SOLS*sizeof(uint32_t)));
     // place to handle nonce if solution is found
-    uint32_t * indices_d = res_d + 8;
+    uint32_t * indices_d = res_d + 8*MAX_SOLS;
+    uint32_t indices_h[MAX_SOLS];
+    
+    uint32_t * count_d;
 
+    CUDA_CALL(cudaMalloc(&count_d,sizeof(uint32_t)));
+
+    CUDA_CALL(cudaMemset(count_d,0,sizeof(uint32_t)));
+
+    
     CUDA_CALL(cudaMemset(
-        indices_d, 0, sizeof(uint32_t)
+        indices_d, 0, sizeof(uint32_t)*MAX_SOLS
     ));
 
     // unfinalized hash contexts
@@ -312,7 +334,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
 
         // calculate solution candidates
         BlockMining<<<1 + (THREADS_PER_ITER - 1) / BLOCK_DIM, BLOCK_DIM>>>(
-            bound_d, data_d, base, hashes_d, res_d, indices_d
+            bound_d, data_d, base, hashes_d, res_d, indices_d, bound_d
         );
 
         VLOG(1) << "Trying to find solution";
@@ -321,35 +343,47 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
         if (blockId != info->blockId.load()) { continue; }
 
         CUDA_CALL(cudaMemcpy(
-            &ind, indices_d, sizeof(uint32_t),
+            indices_h, indices_d, sizeof(uint32_t)*MAX_SOLS,
             cudaMemcpyDeviceToHost
         ));
 
-
+        int i = 0;
         // solution found
-        if (ind)
+        if(indices_h[0])
         {
             CUDA_CALL(cudaMemcpy(
-                res_h, res_d , NUM_SIZE_8,
+                res_h, res_d , NUM_SIZE_8*MAX_SOLS,
                 cudaMemcpyDeviceToHost
             ));
-            
-            
-            *((uint64_t *)nonce) = base + ind - 1;
+            while(indices_h[i] && i < MAX_SOLS)
+            {
+ 
+                *((uint64_t *)nonce) = base + indices_h[i] - 1;
+                
+                LOG(INFO) << "GPU " << deviceId
+                << " found and trying to POST a solution:\n" << logstr;
 
-            
-            PrintPuzzleSolution(nonce, res_h, logstr);
-            LOG(INFO) << "GPU " << deviceId
-            << " found and trying to POST a solution:\n" << logstr;
+                MinerShare share(*((uint64_t *)nonce), w_h, res_h + NUM_SIZE_32*i);
+                shQueue->put(share);
+                /*
 
-            PostPuzzleSolution(to, pkstr, w_h, nonce, res_h);
+                PrintPuzzleSolution(nonce, res_h, logstr);
     
-            state = STATE_KEYGEN;
-            CUDA_CALL(cudaMemset(
-                indices_d, 0, sizeof(uint32_t)
-            ));
-        }
 
+                PostPuzzleSolution(to, pkstr, w_h, nonce, res_h);
+        
+                state = STATE_KEYGEN;
+                
+                */
+                i++;
+   
+            }
+            CUDA_CALL(cudaMemset(
+                indices_d, 0, sizeof(uint32_t)*MAX_SOLS
+            ));
+            CUDA_CALL(cudaMemset(count_d,0,sizeof(uint32_t)));
+
+        }
         base += NONCES_PER_ITER;
     }
     while (1);
@@ -431,10 +465,12 @@ int main(int argc, char ** argv)
     char * fileName = (argc == 1)? confName: argv[1];
     char from[MAX_URL_SIZE];
     info_t info;
-
     info.blockId = 0;
     info.keepPrehash = 0;
     
+    BlockQueue<MinerShare> solQueue;
+
+
     LOG(INFO) << "Using configuration file " << fileName;
 
     // check access to config file
@@ -487,7 +523,7 @@ int main(int argc, char ** argv)
         {
             devinfos[i] = std::make_pair(props.pciBusID, props.pciDeviceID);
         }
-        miners[i] = std::thread(MinerThread, i, &info, &hashrates, &timestamps);
+        miners[i] = std::thread(MinerThread, i, &info, &hashrates, &timestamps, &solQueue);
         hashrates[i] = 0;
         lastTimestamps[i] = 1;
         timestamps[i] = 0;
@@ -505,7 +541,7 @@ int main(int argc, char ** argv)
             LOG(INFO) << "Waiting for block data to be published by node...";
         }
     }
-    
+    std::thread solSender(SenderThread, &info, &solQueue);
     std::thread httpApi = std::thread(HttpApiThread,&hashrates,&devinfos);    
 
     //========================================================================//

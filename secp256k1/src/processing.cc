@@ -86,7 +86,7 @@ int ReadConfig(
         {
             from[0] = '\0';
             to[0] = '\0';
-
+            //shareto[0] = '\0';
             strncat(
                 from, config.GetTokenStart(t + 1), config.GetTokenLen(t + 1)
             );
@@ -95,6 +95,11 @@ int ReadConfig(
             
             strncat(to, config.GetTokenStart(t + 1), config.GetTokenLen(t + 1));
             strcat(to, "/mining/solution");
+            /*
+            strncat(shareto, config.GetTokenStart(t + 1), config.GetTokenLen(t + 1));
+            strcat(shareto, "/mining/share");
+            */
+
 
             VLOG(1) << "from url " << from  << " to url " << to;
 
