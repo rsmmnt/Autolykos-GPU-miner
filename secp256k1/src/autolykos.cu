@@ -63,7 +63,7 @@ void SenderThread(info_t * info, BlockQueue<MinerShare>* shQueue)
         MinerShare share = shQueue->get();
         PostPuzzleSolution(info->to, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
         char logstr[2048];
-        PrintPuzzleSolution((uint8_t*)share.nonce, (uint8_t*)share.d, logstr);
+        PrintPuzzleSolution((uint8_t*)&share.nonce, (uint8_t*)share.d, logstr);
                 
         LOG(INFO) << "Some GPU"
         << " found and trying to POST a solution:\n" << logstr;
