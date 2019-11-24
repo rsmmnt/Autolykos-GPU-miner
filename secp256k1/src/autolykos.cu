@@ -62,7 +62,11 @@ void SenderThread(info_t * info, BlockQueue<MinerShare>* shQueue)
     {
         MinerShare share = shQueue->get();
         PostPuzzleSolution(info->to, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
-
+        char logstr[2048];
+        PrintPuzzleSolution(share.nonce, share.d, logstr);
+                
+        LOG(INFO) << "Some GPU"
+        << " found and trying to POST a solution:\n" << logstr;
     }
 
 
@@ -364,8 +368,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
  
                 *((uint64_t *)nonce) = base + indices_h[i] - 1;
                 
-                LOG(INFO) << "GPU " << deviceId
-                << " found and trying to POST a solution:\n" << logstr;
+               
 
                 MinerShare share(*((uint64_t *)nonce), w_h, res_h + NUM_SIZE_32*i);
                 shQueue->put(share);
