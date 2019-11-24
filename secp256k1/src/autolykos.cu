@@ -336,8 +336,10 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
 
         // calculate solution candidates
         BlockMining<<<1 + (THREADS_PER_ITER - 1) / BLOCK_DIM, BLOCK_DIM>>>(
-            bound_d, data_d, base, hashes_d, res_d, indices_d, bound_d
+            bound_d, data_d, base, hashes_d, res_d, indices_d, count_d
         );
+        
+        CUDA_CALL(cudaPeekAtLastError());
 
         VLOG(1) << "Trying to find solution";
 
