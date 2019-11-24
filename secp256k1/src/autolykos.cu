@@ -371,7 +371,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
  
                 *((uint64_t *)nonce) = base + indices_h[i] - 1;
                 
-               
+                LOG(INFO) << " W full main :" << ((uint64_t*)w_h)[0] << ((uint64_t*)w_h)[1] << ((uint64_t*)w_h)[2] << ((uint64_t*)w_h)[3];
 
                 MinerShare share(*((uint64_t *)nonce), w_h, res_h + NUM_SIZE_32*i);
                 shQueue->put(share);

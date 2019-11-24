@@ -15,7 +15,7 @@ struct MinerShare
         nonce = _nonce;
         memcpy(pubkey_w, _w, PK_SIZE_8);
         memcpy(d, _d, NUM_SIZE_8);
-        std::cout << ((uint64_t*)_w)[0] << " " << ((uint64_t*)pubkey_w)[0] << std::endl;
+        std::cout << "Share constr: " <<((uint64_t*)_w)[0] << " " << ((uint64_t*)pubkey_w)[0] << std::endl;
     }
     uint64_t nonce;
     uint8_t pubkey_w[PK_SIZE_8];
