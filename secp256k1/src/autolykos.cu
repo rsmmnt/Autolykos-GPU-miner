@@ -173,7 +173,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
     uint32_t * res_d;
     CUDA_CALL(cudaMalloc(&res_d, NUM_SIZE_8*MAX_SOLS + MAX_SOLS*sizeof(uint32_t)));
     // place to handle nonce if solution is found
-    uint32_t * indices_d = res_d + 8*MAX_SOLS;
+    uint32_t * indices_d = res_d + NUM_SIZE_32*MAX_SOLS;
     uint32_t indices_h[MAX_SOLS];
     
     uint32_t * count_d;
