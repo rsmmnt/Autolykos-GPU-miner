@@ -9,6 +9,6 @@ MAXREG = 179
 BLOCKDIM = 64
 
 # GPU workspace memory size
-WORKSPACE = 0x400000
+WORKSPACE = 0x100000
 
 # EMBED = -DEMBEDDED_MNEMONIC="\"mnemonic\"" -DEMBEDDED_PASS="\"mnemonicpass\""
