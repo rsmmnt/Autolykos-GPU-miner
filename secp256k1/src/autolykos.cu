@@ -61,15 +61,15 @@ void SenderThread(info_t * info, BlockQueue<MinerShare>* shQueue)
     while(true)
     {
         MinerShare share = shQueue->get();
-        LOG(INFO) << " W first part :" << ((uint64_t*)share.pubkey_w)[0];
-        PostPuzzleSolution(info->to, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
-        
-        
         char logstr[2048];
         PrintPuzzleSolution((uint8_t*)&share.nonce, (uint8_t*)share.d, logstr);
                 
         LOG(INFO) << "Some GPU"
         << " found and trying to POST a solution:\n" << logstr;
+        PostPuzzleSolution(info->to, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
+        
+        
+
     }
 
 
@@ -293,7 +293,6 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
             blockId = controlId;
             
             GenerateKeyPair(x_h, w_h);
-            LOG(INFO) << " W after gen :" << ((uint64_t*)w_h)[0] << ((uint64_t*)w_h)[1] << ((uint64_t*)w_h)[2] << ((uint64_t*)w_h)[3];
 
             VLOG(1) << "Generated new keypair,"
                 << " copying new data in device memory now";
@@ -372,8 +371,6 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
  
                 *((uint64_t *)nonce) = base + indices_h[i] - 1;
                 
-                LOG(INFO) << " W full main :" << ((uint64_t*)w_h)[0] << ((uint64_t*)w_h)[1] << ((uint64_t*)w_h)[2] << ((uint64_t*)w_h)[3];
-
                 MinerShare share(*((uint64_t *)nonce), w_h, res_h + NUM_SIZE_32*i);
                 shQueue->put(share);
                 /*
