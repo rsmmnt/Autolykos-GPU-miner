@@ -386,7 +386,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
                 i++;
    
             }
-            LOG(INFO) << "Found " << i << " shares"
+            LOG(INFO) << "Found " << i << " shares";
             CUDA_CALL(cudaMemset(
                 indices_d, 0, sizeof(uint32_t)*MAX_SOLS
             ));
