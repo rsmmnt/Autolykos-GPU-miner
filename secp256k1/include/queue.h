@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <vector>
 #include <deque>
+#include <iostream>
 // all that we need to send to node/pool
 struct MinerShare
 {
@@ -14,6 +15,7 @@ struct MinerShare
         nonce = _nonce;
         memcpy(pubkey_w, _w, PK_SIZE_8);
         memcpy(d, _d, NUM_SIZE_8);
+        std::cout << ((uint64_t*)_w)[0] << " " << ((uint64_t*)pubkey_w)[0] << std::endl;
     }
     uint64_t nonce;
     uint8_t pubkey_w[PK_SIZE_8];
