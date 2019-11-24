@@ -61,7 +61,10 @@ void SenderThread(info_t * info, BlockQueue<MinerShare>* shQueue)
     while(true)
     {
         MinerShare share = shQueue->get();
+        LOG(INFO) << " W first part :" << ((uint64_t*)share.pubkey_w)[0];
         PostPuzzleSolution(info->to, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
+        
+        
         char logstr[2048];
         PrintPuzzleSolution((uint8_t*)&share.nonce, (uint8_t*)share.d, logstr);
                 
