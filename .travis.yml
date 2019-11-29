@@ -40,9 +40,6 @@ before_install:
   - PATH=${CUDA_HOME}/bin:${PATH}
   - PATH=${PATH}:${PWD}
 
-before_script:
+script:
     - cd secp256k1
     - make
-
-script: 
-    - ./auto.out
