@@ -44,4 +44,6 @@ before_script:
     - cd secp256k1
     - make
 
-script: auto.out
+script: 
+    - cd secp256k1
+    - ./auto.out
