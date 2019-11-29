@@ -43,7 +43,7 @@ before_install:
   - PATH=${PATH}:${PWD}
 
 before_script:
-    - cd Autolykos-GPU-miner/secp256k1
+    - cd secp256k1
     - make
 
 script: auto.out
