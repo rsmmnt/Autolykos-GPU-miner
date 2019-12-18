@@ -121,7 +121,7 @@ int ReadConfig(
             seedstring = (char*)malloc((config.GetTokenLen(t + 1) + 1)*sizeof(char));
             seedstring[0] = '\0';
             strncat(seedstring, config.GetTokenStart(t + 1), config.GetTokenLen(t + 1));
-
+            VLOG(1) << "Mnemonic read: " << seedstring;
             readSeed = 1;
         }
         else if (config.jsoneq(t, "mnemonicPass") || config.jsoneq(t,"seedPass"))

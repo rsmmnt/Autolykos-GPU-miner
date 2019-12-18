@@ -293,6 +293,8 @@ int ParseRequestWithPBound(json_t * oldreq, json_t * newreq, info_t *info, int c
 
 	}
 
+    VLOG(1) << "PkPos: " << PkPos << " PBoundPos: " << PBoundPos << "BoundPos: " << BoundPos;
+
 	if (PkPos < 0 || BoundPos < 0 || MesPos < 0 || PBoundPos < 0)
 	{
 		LOG(ERROR) << "Some of expected fields not present in /block/candidate";
