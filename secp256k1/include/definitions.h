@@ -253,7 +253,9 @@ struct info_t
     char pkstr[PK_SIZE_4 + 1];
     int keepPrehash;
     char to[MAX_URL_SIZE];
-
+    //pool additions
+    uint8_t poolbound[NUM_SIZE_8];
+    char pool[MAX_URL_SIZE];
     // Increment when new block is sent by node
     std::atomic<uint_t> blockId; 
 };

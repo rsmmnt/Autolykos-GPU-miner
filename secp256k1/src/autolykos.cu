@@ -62,12 +62,32 @@ void SenderThread(info_t * info, BlockQueue<MinerShare>* shQueue)
     {
         MinerShare share = shQueue->get();
         char logstr[2048];
-        PrintPuzzleSolution((uint8_t*)&share.nonce, (uint8_t*)share.d, logstr);
-                
-        LOG(INFO) << "Some GPU"
-        << " found and trying to POST a solution:\n" << logstr;
-        PostPuzzleSolution(info->to, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
         
+        uint64_t* r = (uint64_t*)share.d;
+        uint64_t* bound = (uint64_t*)(info->bound); 
+
+        int issol = ((uint64_t *)r)[3] < ((uint64_t *)bound)[3]
+        || (((uint64_t *)r)[3] == ((uint64_t *)bound)[3] && (
+            ((uint64_t *)r)[2] < ((uint64_t *)bound)[2]
+            || ((uint64_t *)r)[2] == ((uint64_t *)bound)[2] && (
+                ((uint64_t *)r)[1] < ((uint64_t *)bound)[1]
+                || ((uint64_t *)r)[1] == ((uint64_t *)bound)[1]
+                && ((uint64_t *)r)[0] < ((uint64_t *)bound)[0]
+            )
+        ));
+        PrintPuzzleSolution((uint8_t*)&share.nonce, (uint8_t*)share.d, logstr);
+        if(issol)
+        {        
+            LOG(INFO) << "Some GPU"
+            << " found and trying to POST a solution:\n" << logstr;
+            PostPuzzleSolution(info->to, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
+        }
+        else
+        {
+            LOG(INFO) << "Some GPU"
+            << " found and trying to POST a share to the pool:\n" << logstr;
+            PostPuzzleSolution(info->pool, info->pkstr, share.pubkey_w, (uint8_t*)&share.nonce, share.d);
+        }
         
 
     }
@@ -123,9 +143,10 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
     //========================================================================//
     info->info_mutex.lock();
 
+    
     memcpy(sk_h, info->sk, NUM_SIZE_8);
     memcpy(mes_h, info->mes, NUM_SIZE_8);
-    memcpy(bound_h, info->bound, NUM_SIZE_8);
+    memcpy(bound_h, info->poolbound, NUM_SIZE_8);
     memcpy(pk_h, info->pk, PK_SIZE_8);
     memcpy(pkstr, info->pkstr, (PK_SIZE_4 + 1) * sizeof(char));
     memcpy(skstr, info->skstr, NUM_SIZE_4 * sizeof(char));
@@ -285,7 +306,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates, st
             info->info_mutex.lock();
 
             memcpy(mes_h, info->mes, NUM_SIZE_8);
-            memcpy(bound_h, info->bound, NUM_SIZE_8);
+            memcpy(bound_h, info->poolbound, NUM_SIZE_8);
 
             info->info_mutex.unlock();
 
@@ -491,7 +512,7 @@ int main(int argc, char ** argv)
 
     // read configuration from file
     status = ReadConfig(
-        fileName, info.sk, info.skstr, from, info.to, &info.keepPrehash
+        fileName, info.sk, info.skstr, from, info.to, info.pool, &info.keepPrehash
     );
 
     if (status == EXIT_FAILURE) { return EXIT_FAILURE; }

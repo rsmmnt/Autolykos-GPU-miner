@@ -363,19 +363,19 @@ __global__ void BlockMining(
 
    
             j = ((uint64_t *)r)[3] < ((uint64_t *)bound)[3]
-            || ((uint64_t *)r)[3] == ((uint64_t *)bound)[3] && (
+            || (((uint64_t *)r)[3] == ((uint64_t *)bound)[3] && (
                 ((uint64_t *)r)[2] < ((uint64_t *)bound)[2]
                 || ((uint64_t *)r)[2] == ((uint64_t *)bound)[2] && (
                     ((uint64_t *)r)[1] < ((uint64_t *)bound)[1]
                     || ((uint64_t *)r)[1] == ((uint64_t *)bound)[1]
                     && ((uint64_t *)r)[0] < ((uint64_t *)bound)[0]
                 )
-            );
+            ));
             
             if(j)
             {
 
-                uint32_t id = atomicInc(count,1);
+                uint32_t id = atomicInc(count, MAX_SOLS);
                 valid[id] = tid+1; 
                 #pragma unroll
                 for (int i = 0; i < NUM_SIZE_32; ++i)
