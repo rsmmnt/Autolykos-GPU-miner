@@ -107,7 +107,7 @@
 #define MAX_JSON_CAPACITY  8192
 
 // total JSON objects count
-#define REQ_LEN            7
+#define REQ_LEN            9
 
 // JSON position of message
 #define MES_POS            2
